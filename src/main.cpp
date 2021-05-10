@@ -2,9 +2,10 @@
 // Created by Akshay Patil on 5/8/21.
 //
 
-#include "main.h"
+#include <iostream>
+using namespace std;
 
 int main() {
-    cout<<"Hello, World!";
+    cout<<"Hello, World!\n";
     return 0;
 }
