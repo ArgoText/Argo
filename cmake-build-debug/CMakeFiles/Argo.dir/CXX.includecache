@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/akshaypatil/Desktop/Projects/Argo/src/main.cpp
+main.h
+/Users/akshaypatil/Desktop/Projects/Argo/src/main.h
+
+/Users/akshaypatil/Desktop/Projects/Argo/src/main.h
+iostream
+-
+
