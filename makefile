@@ -7,7 +7,7 @@ CC = g++
 CFLAGS = -Wall
 
 # the build target executable
-TARGET = src/main
+TARGET = src/*
 OUTPUT = bin/main
 
 all: $(TARGET)
@@ -16,4 +16,4 @@ $(TARGET): $(TARGET).cpp
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(TARGET).cpp
 
 clean:
-	$(RM) $(TARGET)
+	$(RM) $(OUTPUT)

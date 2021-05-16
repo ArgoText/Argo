@@ -1,10 +1,11 @@
 class Buffer {
 
     char *point;
-    char *buffer;
+    char *bufferStart;
+    char *bufferEnd;
     char *gapStart;
     char *gapEnd;
-    int curLine;
+    int currLine;
 
     int initBuffer(unsigned int size);
 
@@ -16,7 +17,11 @@ public:
 
     static const int DEFAULT_GAP_SIZE = 20;
 
-    Buffer();
+    Buffer(unsigned int size = DEFAULT_GAP_SIZE);
+
+    void moveGapToPoint();
+
+    void copyBytes(char *destination, char *source, unsigned int length);
 
     void setPoint(unsigned int loc);
 
@@ -28,7 +33,7 @@ public:
 
     int getColumn();
 
-    void setColumn();
+    void setColumn(unsigned int column);
 
     char getChar();
 
@@ -40,15 +45,17 @@ public:
 
     void insertChar(char ch);
 
+    void insertString(const char *string);
+
     void deleteChar();
 
     void replaceChar(char ch);
 
-    void searchForward(char ch);
+    char * searchForward(char ch);
 
     void searchForward(char *string);
 
-    void searchBackward(char ch);
+    char * searchBackward(char ch);
 
     void searchBackward(char *string);
 
