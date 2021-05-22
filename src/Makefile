@@ -14,7 +14,7 @@ EQ            = =
 
 CC            = gcc
 CXX           = g++
-DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
+DEFINES       = -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I. -I. -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
@@ -55,11 +55,14 @@ OBJECTS_DIR   = ./
 SOURCES       = buffer.cpp \
 		main.cpp \
 		mainwindow.cpp \
-		editorview.cpp 
+		editorview.cpp moc_mainwindow.cpp \
+		moc_editorview.cpp
 OBJECTS       = buffer.o \
 		main.o \
 		mainwindow.o \
-		editorview.o
+		editorview.o \
+		moc_mainwindow.o \
+		moc_editorview.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -353,8 +356,20 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -O2 -Wall -W -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all:
+compiler_moc_header_make_all: moc_mainwindow.cpp moc_editorview.cpp
 compiler_moc_header_clean:
+	-$(DEL_FILE) moc_mainwindow.cpp moc_editorview.cpp
+moc_mainwindow.cpp: mainwindow.h \
+		editorview.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/patrick/Argo/src/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/patrick/Argo/src -I/home/patrick/Argo/src -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include mainwindow.h -o moc_mainwindow.cpp
+
+moc_editorview.cpp: editorview.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/patrick/Argo/src/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/patrick/Argo/src -I/home/patrick/Argo/src -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include editorview.h -o moc_editorview.cpp
+
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
@@ -367,7 +382,7 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_moc_predefs_clean 
+compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean 
 
 ####### Compile
 
@@ -384,6 +399,12 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 
 editorview.o: editorview.cpp editorview.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o editorview.o editorview.cpp
+
+moc_mainwindow.o: moc_mainwindow.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp
+
+moc_editorview.o: moc_editorview.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_editorview.o moc_editorview.cpp
 
 ####### Install
 
