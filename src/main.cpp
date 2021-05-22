@@ -1,6 +1,10 @@
-#include <iostream>
-#include "buffer.h"
+#include <QApplication>
+#include <QKeyEvent>
+#include "mainwindow.h"
 
-int main() {
-    return 0;
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+    MainWindow window;
+    window.show();
+    return app.exec();
 }
