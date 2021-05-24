@@ -1,5 +1,7 @@
 #include <QWidget>
 #include <QPaintEvent>
+#include <QKeyEvent>
+#include "buffer.h"
 
 
 class EditorView : public QWidget {
@@ -14,8 +16,9 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
 private:
     QFont displayFont;
-
+    Buffer *buffer;
 };

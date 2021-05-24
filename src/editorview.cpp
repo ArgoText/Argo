@@ -7,6 +7,7 @@
 EditorView::EditorView(QWidget *parent) : QWidget(parent) {
     //calculateSquareSize();
     setMouseTracking(true);
+    buffer = Buffer();
 }
 
 EditorView::~EditorView() {};
@@ -44,4 +45,8 @@ void EditorView::updateFont(const QFont &font) {
  */
 QSize EditorView::sizeHint() const {
     return QSize(1000, 10000);
+}
+
+void EditorView::keyPressEvent(QKeyEvent *event) {
+    buffer->insertChar(event->ascii());
 }
