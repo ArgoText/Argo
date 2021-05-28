@@ -17,5 +17,6 @@ protected:
 
 private:
     QFont displayFont;
+    int count;
 
 };

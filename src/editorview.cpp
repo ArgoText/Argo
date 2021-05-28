@@ -14,7 +14,13 @@ EditorView::~EditorView() {};
 void EditorView::paintEvent(QPaintEvent *event) {
 
     QPainter painter(this);
+
+
     painter.fillRect(event->rect(), QBrush(Qt::white));
+
+    if (count % 2 == 0) {
+
+    }
     painter.setPen(QPen(Qt::black));
     displayFont.setStyleHint(QFont::TypeWriter);
     painter.setFont(displayFont);
@@ -26,11 +32,17 @@ void EditorView::paintEvent(QPaintEvent *event) {
 
     QString a = QString(QChar('A'));
 
-    for(int line = 0; line < 50; line++) {
-        for(int column = 0; column < 80; column++) {
-            painter.drawText(width * column, fontMetrics.height() * line, QString(QChar('A')));
-        }
+    int firstLineVisible = event->rect().top() / fontMetrics.height();
+    int lastLineVisible = firstLineVisible + event->rect().height() / fontMetrics.height() + 1;
+
+    for(int line = firstLineVisible; line <= lastLineVisible; line++) {
+//        for(int column = 0; column < 80; column++) {
+//            painter.drawText(width * column, fontMetrics.height() * line, QString(QChar('A')));
+//        }
+        painter.drawText(0, fontMetrics.height() * line, QString::number(line));
     }
+
+
 }
 
 
@@ -43,5 +55,5 @@ void EditorView::updateFont(const QFont &font) {
  * initial size of the editor widget
  */
 QSize EditorView::sizeHint() const {
-    return QSize(1000, 10000);
+    return QSize(1000, 100000000000);
 }
