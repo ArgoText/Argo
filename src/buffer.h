@@ -25,13 +25,19 @@ public:
 
     void setPoint(unsigned int loc);
 
+    void setPointAbsolute(char * loc);
+
     void movePoint(unsigned int count);
 
     char * getPoint();
 
+    int getRelativePoint();
+
     int getLine();
 
     int getColumn();
+
+    char * getBufferEnd();
 
     void setColumn(unsigned int column);
 

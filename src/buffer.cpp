@@ -93,8 +93,8 @@ void Buffer::copyBytes(char *destination, char *source, unsigned int length) {
  */
 void Buffer::setPoint(unsigned int loc) {
     point = bufferStart + loc;
-    if (point >= gapStart && point < gapEnd) {
-        point = gapEnd;
+    if (point > gapStart) {
+        point += gapEnd - gapStart;
     }
 }
 
@@ -112,6 +112,10 @@ char * Buffer::getPoint() {
     return point;
 }
 
+int Buffer::getRelativePoint() {
+    return point - bufferStart;
+}
+
 int Buffer::getLine() {
     return currLine;
 }
@@ -119,6 +123,10 @@ int Buffer::getLine() {
 int Buffer::getColumn() {
     char *startLine = searchBackward('\n');
     return point - startLine;
+}
+
+char * Buffer::getBufferEnd() {
+    return bufferEnd;
 }
 
 void Buffer::setColumn(unsigned int column) {
