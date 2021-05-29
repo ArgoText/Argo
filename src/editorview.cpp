@@ -66,7 +66,9 @@ QSize EditorView::sizeHint() const {
 
 void EditorView::keyPressEvent(QKeyEvent *event) {
     if (event->modifiers() & Qt::ShiftModifier) {
-        buffer->insertChar(char(event->key()));
+        if (event->key() != Qt::Key_Shift) {
+            buffer->insertChar(char(event->key()));
+        }
     } else {
         buffer->insertChar(char(event->key() + 32));
     }
