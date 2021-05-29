@@ -48,10 +48,7 @@ void EditorView::paintEvent(QPaintEvent *event) {
         buffer->movePoint(1);
         line++;
     }
-
     buffer->setPoint(initialPoint);
-
-
 }
 
 
@@ -68,6 +65,14 @@ QSize EditorView::sizeHint() const {
 }
 
 void EditorView::keyPressEvent(QKeyEvent *event) {
-    buffer->insertChar(char(event->key()));
+    buffer->insertChar(translate(event->key()));
     update();
+}
+
+char EditorView::translate(QKey *key) {
+    if (key->modifiers() & Qt::ShiftModifier) {
+        return char(key);
+    } else {
+        return char(key) + 32;
+    }
 }
