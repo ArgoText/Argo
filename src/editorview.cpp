@@ -65,14 +65,10 @@ QSize EditorView::sizeHint() const {
 }
 
 void EditorView::keyPressEvent(QKeyEvent *event) {
-    buffer->insertChar(translate(event->key()));
-    update();
-}
-
-char EditorView::translate(QKey *key) {
-    if (key->modifiers() & Qt::ShiftModifier) {
-        return char(key);
+    if (event->modifiers() & Qt::ShiftModifier) {
+        buffer->insertChar(char(event->key()));
     } else {
-        return char(key) + 32;
+        buffer->insertChar(char(event->key() + 32));
     }
+    update();
 }
