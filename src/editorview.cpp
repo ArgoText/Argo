@@ -8,6 +8,7 @@ EditorView::EditorView(QWidget *parent) : QWidget(parent) {
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
     buffer = new Buffer;
+    displayFont = QFont("Monospace");
 }
 
 EditorView::~EditorView() {};
@@ -17,7 +18,7 @@ void EditorView::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.fillRect(event->rect(), QBrush(Qt::white));
     painter.setPen(QPen(Qt::black));
-    displayFont.setStyleHint(QFont::TypeWriter);
+    displayFont.setStyleHint(QFont::Monospace);
     painter.setFont(displayFont);
     QFontMetrics fontMetrics(displayFont);
 
