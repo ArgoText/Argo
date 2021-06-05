@@ -2,22 +2,25 @@
 #include <QPainter>
 #include <QSize>
 #include <QFontMetrics>
+#include <QColor>
 #include "editorview.h"
 
 EditorView::EditorView(QWidget *parent) : QWidget(parent) {
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
     buffer = new Buffer;
-    displayFont = QFont("Monospace");
+    displayFont = QFont("DejaVu Sans Mono");
 }
 
 EditorView::~EditorView() {};
 
 void EditorView::paintEvent(QPaintEvent *event) {
 
+    //resize(200, 200);
+
     QPainter painter(this);
-    painter.fillRect(event->rect(), QBrush(Qt::white));
-    painter.setPen(QPen(Qt::black));
+    painter.fillRect(event->rect(), QBrush(QColor(10, 19, 27)));
+    painter.setPen(QPen(QColor(255,255,255)));
     displayFont.setStyleHint(QFont::Monospace);
     painter.setFont(displayFont);
     QFontMetrics fontMetrics(displayFont);
@@ -61,9 +64,10 @@ void EditorView::updateFont(const QFont &font) {
 /*
  * initial size of the editor widget
  */
-QSize EditorView::sizeHint() const {
-    return QSize(1000, 10000);
-}
+// QSize EditorView::sizeHint() const {
+//     return QSize(1000, 10000);
+// }
+
 
 void EditorView::keyPressEvent(QKeyEvent *event) {
     if (event->modifiers() & Qt::ShiftModifier) {

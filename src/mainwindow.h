@@ -1,5 +1,6 @@
 #include <QMainWindow>
 #include <QScrollArea>
+#include <QVBoxLayout>
 #include "editorview.h"
 
 class MainWindow : public QMainWindow {
@@ -11,4 +12,6 @@ public:
 private:
     EditorView *editorView;
     QScrollArea *scrollArea;
+    QWidget *centralWidget;
+    QVBoxLayout *centralLayout;
 };

@@ -12,7 +12,7 @@ public:
     ~EditorView();
 
     void updateFont(const QFont &font);
-    QSize sizeHint() const override;
+    //QSize sizeHint() const override;
 
 protected:
     void paintEvent(QPaintEvent *event) override;
