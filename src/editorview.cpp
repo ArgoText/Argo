@@ -1,8 +1,10 @@
 #include <iostream>
+#include <fstream>
 #include <QPainter>
 #include <QSize>
 #include <QFontMetrics>
 #include <QFileDialog>
+#include <QTextStream>
 #include <QColor>
 #include "editorview.h"
 
@@ -47,7 +49,7 @@ void EditorView::paintEvent(QPaintEvent *event) {
     int line = 1;
     while (buffer->getPoint() < buffer->getBufferEnd()) {    
         int col = 0;
-        while (buffer->getChar() != Qt::Key_Enter && buffer->getPoint() < buffer->getBufferEnd()) {
+        while (buffer->getChar() != '\n' && buffer->getPoint() < buffer->getBufferEnd()) {
             painter.drawText(width * col, fontMetrics.height() * line, QString(QChar(buffer->getChar())));
             if (buffer->getRelativePoint() == initialPoint - 1) {
                 painter.drawRect(width * (col+1) - 1, fontMetrics.height() * (line-1), 1, fontMetrics.height());
@@ -88,12 +90,17 @@ void EditorView::keyPressEvent(QKeyEvent *event) {
             if(file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
                 QTextStream stream(&file);
 
-                for (char c : buffer) {
-                    stream << c
+                char *current = buffer->getBufferStart();
+
+                while (current < buffer->getBufferEnd()) {
+                    if (*current < 128 && *current != '\00') {
+                        stream << *current;
+                    }
+                    current++;
                 }
 
                 file.close();
-                qDebug() << "Writing finished";
+                //qDebug() << "Writing finished";
             }
         }
     } else {

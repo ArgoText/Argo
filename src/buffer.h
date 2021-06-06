@@ -37,6 +37,8 @@ public:
 
     int getColumn();
 
+    char * getBufferStart();
+
     char * getBufferEnd();
 
     void setColumn(unsigned int column);

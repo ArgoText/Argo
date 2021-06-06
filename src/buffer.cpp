@@ -125,6 +125,10 @@ int Buffer::getColumn() {
     return point - startLine;
 }
 
+char * Buffer::getBufferStart() {
+    return bufferStart;
+}
+
 char * Buffer::getBufferEnd() {
     return bufferEnd;
 }
