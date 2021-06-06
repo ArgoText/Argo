@@ -84,6 +84,18 @@ void EditorView::keyPressEvent(QKeyEvent *event) {
             QString fileName = QFileDialog::getSaveFileName(this,
                                                             tr("Save file"), "",
                                                             tr("All Files (*)"));
+            QFile file(fileName.toUtf8().constData());
+            if(file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
+            {
+                QTextStream stream(&file);
+
+                for (char c : buffer) {
+                    stream << c
+                }
+
+                file.close();
+                qDebug() << "Writing finished";
+            }
         }
     } else {
         buffer->insertChar(char(event->key() + 32));
