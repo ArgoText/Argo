@@ -1,7 +1,9 @@
 #include <iostream>
+#include <fstream>
 #include <QPainter>
 #include <QSize>
 #include <QFontMetrics>
+#include <QFileDialog>
 #include <QColor>
 #include "editorview.h"
 
@@ -10,6 +12,7 @@ EditorView::EditorView(QWidget *parent) : QWidget(parent) {
     setFocusPolicy(Qt::StrongFocus);
     buffer = new Buffer;
     displayFont = QFont("DejaVu Sans Mono");
+    resize(2000, 20000);
     //displayFont = QFont("Monaco");
 }
 
@@ -17,7 +20,7 @@ EditorView::~EditorView() {};
 
 void EditorView::paintEvent(QPaintEvent *event) {
 
-    //resize(200, 200);
+    resize(2000, 20000);
 
     QPainter painter(this);
     painter.fillRect(event->rect(), QBrush(QColor(10, 19, 27)));
@@ -45,7 +48,7 @@ void EditorView::paintEvent(QPaintEvent *event) {
     int line = 1;
     while (buffer->getPoint() < buffer->getBufferEnd()) {    
         int col = 0;
-        while (buffer->getChar() != Qt::Key_Enter && buffer->getPoint() < buffer->getBufferEnd()) {
+        while (buffer->getChar() != '\n' && buffer->getPoint() < buffer->getBufferEnd()) {
             painter.drawText(width * col, fontMetrics.height() * line, QString(QChar(buffer->getChar())));
             if (buffer->getRelativePoint() == initialPoint - 1) {
                 painter.drawRect(width * (col+1) - 1, fontMetrics.height() * (line-1), 1, fontMetrics.height());
@@ -67,16 +70,33 @@ void EditorView::updateFont(const QFont &font) {
 
 void EditorView::keyPressEvent(QKeyEvent *event) {
 
-    if (event->key() >= 65 && event->key() <= 90) {
-        if (event->modifiers() & Qt::ShiftModifier) {
-            if (event->key() != Qt::Key_Shift) {
-                buffer->insertChar(char(event->key()));
+    if (event->modifiers() & Qt::ShiftModifier) {
+        if (event->key() != Qt::Key_Shift) {
+            buffer->insertChar(char(event->key()));
+        }
+    } else if (event->modifiers() & Qt::ControlModifier) {
+        if (event->key() == Qt::Key_O) {
+            QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),"/home",tr("Text Files (*.cpp)"));
+            char ch;
+            std::ifstream fin(fileName.toUtf8().constData(), std::ifstream::in);
+            while (fin >> std::noskipws >> ch) {
+                buffer->insertChar(ch);
             }
-    }   else {
-            buffer->insertChar(char(event->key() + 32));
         }
     } else {
-        buffer->insertChar(char(event->key()));
+        buffer->insertChar(char(event->key() + 32));
     }
+
+    // if (event->key() >= 65 && event->key() <= 90) {
+    //     if (event->modifiers() & Qt::ShiftModifier) {
+    //         if (event->key() != Qt::Key_Shift) {
+    //             buffer->insertChar(char(event->key()));
+    //         }
+    // }   else {
+    //         buffer->insertChar(char(event->key() + 32));
+    //     }
+    // } else {
+    //     buffer->insertChar(char(event->key()));
+    // }
     update();
 }

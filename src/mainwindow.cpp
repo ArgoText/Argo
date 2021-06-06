@@ -3,8 +3,7 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     scrollArea = new QScrollArea;
     editorView = new EditorView;
-    scrollArea->setLayout(new QVBoxLayout);
-    scrollArea->layout()->addWidget(editorView);
+    scrollArea->setWidget(editorView);
 
     QVBoxLayout *centralLayout = new QVBoxLayout;
     centralLayout->addWidget(scrollArea);
