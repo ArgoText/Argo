@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include <QPainter>
 #include <QSize>
 #include <QFontMetrics>
@@ -48,7 +47,7 @@ void EditorView::paintEvent(QPaintEvent *event) {
     int line = 1;
     while (buffer->getPoint() < buffer->getBufferEnd()) {    
         int col = 0;
-        while (buffer->getChar() != '\n' && buffer->getPoint() < buffer->getBufferEnd()) {
+        while (buffer->getChar() != Qt::Key_Enter && buffer->getPoint() < buffer->getBufferEnd()) {
             painter.drawText(width * col, fontMetrics.height() * line, QString(QChar(buffer->getChar())));
             if (buffer->getRelativePoint() == initialPoint - 1) {
                 painter.drawRect(width * (col+1) - 1, fontMetrics.height() * (line-1), 1, fontMetrics.height());
@@ -69,7 +68,6 @@ void EditorView::updateFont(const QFont &font) {
 }
 
 void EditorView::keyPressEvent(QKeyEvent *event) {
-
     if (event->modifiers() & Qt::ShiftModifier) {
         if (event->key() != Qt::Key_Shift) {
             buffer->insertChar(char(event->key()));
@@ -82,21 +80,13 @@ void EditorView::keyPressEvent(QKeyEvent *event) {
             while (fin >> std::noskipws >> ch) {
                 buffer->insertChar(ch);
             }
+        } else if (event->key() == Qt::Key_S) {
+            QString fileName = QFileDialog::getSaveFileName(this,
+                                                            tr("Save file"), "",
+                                                            tr("All Files (*)"));
         }
     } else {
         buffer->insertChar(char(event->key() + 32));
     }
-
-    // if (event->key() >= 65 && event->key() <= 90) {
-    //     if (event->modifiers() & Qt::ShiftModifier) {
-    //         if (event->key() != Qt::Key_Shift) {
-    //             buffer->insertChar(char(event->key()));
-    //         }
-    // }   else {
-    //         buffer->insertChar(char(event->key() + 32));
-    //     }
-    // } else {
-    //     buffer->insertChar(char(event->key()));
-    // }
     update();
 }
