@@ -69,6 +69,15 @@ void EditorView::keyPressEvent(QKeyEvent *event) {
         if (event->key() != Qt::Key_Shift) {
             buffer->insertChar(char(event->key()));
         }
+    } else if (event->modifiers() & Qt::CtrlModifier) {
+        if (event->key() != Qt::Key_O) {
+            QStringList fileName = QFileDialog::getOpenFileName(this, tr("Open File"),"/home",tr("Text Files (*.txt)"));
+            char ch;
+            fstream fin(f, fstream::in);
+            while (fin >> noskipws >> ch) {
+                buffer->insertChar(ch);
+            }
+        }
     } else {
         buffer->insertChar(char(event->key() + 32));
     }
