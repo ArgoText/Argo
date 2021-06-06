@@ -10,6 +10,7 @@ EditorView::EditorView(QWidget *parent) : QWidget(parent) {
     setFocusPolicy(Qt::StrongFocus);
     buffer = new Buffer;
     displayFont = QFont("DejaVu Sans Mono");
+    //displayFont = QFont("Monaco");
 }
 
 EditorView::~EditorView() {};
@@ -25,7 +26,7 @@ void EditorView::paintEvent(QPaintEvent *event) {
     painter.setFont(displayFont);
     QFontMetrics fontMetrics(displayFont);
 
-    int width = fontMetrics.horizontalAdvance("A") + 1;
+    int width = fontMetrics.horizontalAdvance("A");
     QString a = QString(QChar('A'));
 
     int firstLineVisible = event->rect().top() / fontMetrics.height();
@@ -46,6 +47,9 @@ void EditorView::paintEvent(QPaintEvent *event) {
         int col = 0;
         while (buffer->getChar() != Qt::Key_Enter && buffer->getPoint() < buffer->getBufferEnd()) {
             painter.drawText(width * col, fontMetrics.height() * line, QString(QChar(buffer->getChar())));
+            if (buffer->getRelativePoint() == initialPoint - 1) {
+                painter.drawRect(width * (col+1) - 1, fontMetrics.height() * (line-1), 1, fontMetrics.height());
+            }
             buffer->movePoint(1);
             col++;
         }
@@ -61,21 +65,18 @@ void EditorView::updateFont(const QFont &font) {
     update();
 }
 
-/*
- * initial size of the editor widget
- */
-// QSize EditorView::sizeHint() const {
-//     return QSize(1000, 10000);
-// }
-
-
 void EditorView::keyPressEvent(QKeyEvent *event) {
-    if (event->modifiers() & Qt::ShiftModifier) {
-        if (event->key() != Qt::Key_Shift) {
-            buffer->insertChar(char(event->key()));
+
+    if (event->key() >= 65 && event->key() <= 90) {
+        if (event->modifiers() & Qt::ShiftModifier) {
+            if (event->key() != Qt::Key_Shift) {
+                buffer->insertChar(char(event->key()));
+            }
+    }   else {
+            buffer->insertChar(char(event->key() + 32));
         }
     } else {
-        buffer->insertChar(char(event->key() + 32));
+        buffer->insertChar(char(event->key()));
     }
     update();
 }
