@@ -85,8 +85,7 @@ void EditorView::keyPressEvent(QKeyEvent *event) {
                                                             tr("Save file"), "",
                                                             tr("All Files (*)"));
             QFile file(fileName.toUtf8().constData());
-            if(file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
-            {
+            if(file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
                 QTextStream stream(&file);
 
                 for (char c : buffer) {
