@@ -33,34 +33,28 @@ void EditorView::paintEvent(QPaintEvent *event) {
     int width = fontMetrics.horizontalAdvance("A");
     QString a = QString(QChar('A'));
 
-    int firstLineVisible = event->rect().top() / fontMetrics.height();
-    int lastLineVisible = firstLineVisible + event->rect().height() / fontMetrics.height() + 1;
+    char *curr = buffer->getBufferStart();
+    int line = 0;
+    int col = 0;
+    while (curr < buffer->getBufferEnd()) {
 
-    int initialPoint = buffer->getRelativePoint();
-
-    buffer->setPoint(0);
-
-
-    // for(int line = firstLineVisible; line <= lastLineVisible; line++) {
-//        for(int column = 0; column < 80; column++) {
-//            painter.drawText(width * column, fontMetrics.height() * line, QString(QChar('A')));
-//        }
-        //painter.drawText(0, fontMetrics.height() * line, QString::number(line));
-    int line = 1;
-    while (buffer->getPoint() < buffer->getBufferEnd()) {    
-        int col = 0;
-        while (buffer->getChar() != '\n' && buffer->getPoint() < buffer->getBufferEnd()) {
-            painter.drawText(width * col, fontMetrics.height() * line, QString(QChar(buffer->getChar())));
-            if (buffer->getRelativePoint() == initialPoint - 1) {
-                painter.drawRect(width * (col+1) - 1, fontMetrics.height() * (line-1), 1, fontMetrics.height());
-            }
-            buffer->movePoint(1);
-            col++;
+        if (curr == buffer->getPoint()) {
+            painter.drawRect(width * (col) - 1, fontMetrics.height() * line, 1, fontMetrics.height());
         }
-        buffer->movePoint(1);
-        line++;
+
+        if (curr < buffer->getGapStart() || curr >= buffer->getGapEnd()) {
+            if (*curr == '\n') {
+                line++;
+                col = 0;
+            } else {
+                painter.drawText(width * col, fontMetrics.height() * (line + 1), QString(QChar(*curr)));
+                col++;
+            }
+        }
+
+        curr++;
+
     }
-    buffer->setPoint(initialPoint);
 }
 
 
@@ -70,10 +64,14 @@ void EditorView::updateFont(const QFont &font) {
 }
 
 void EditorView::keyPressEvent(QKeyEvent *event) {
-    if (event->modifiers() & Qt::ShiftModifier) {
-        if (event->key() != Qt::Key_Shift) {
-            buffer->insertChar(char(event->key()));
-        }
+    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+        buffer->insertChar('\n');
+    } else if (event->key() == Qt::Key_Right) {
+        buffer->nextChar();
+    } else if (event->key() == Qt::Key_Left) {
+        buffer->previousChar();
+    } else if (event->key() == Qt::Key_Backspace) {
+        buffer->backspace();
     } else if (event->modifiers() & Qt::ControlModifier) {
         if (event->key() == Qt::Key_O) {
             QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),"/home",tr("Text Files (*.cpp)"));
@@ -103,8 +101,10 @@ void EditorView::keyPressEvent(QKeyEvent *event) {
                 //qDebug() << "Writing finished";
             }
         }
-    } else {
+    } else if (event->key() >= 65 && event->key() <= 90 && !(event->modifiers() & Qt::ShiftModifier)) {
         buffer->insertChar(char(event->key() + 32));
+    } else if (event->key() >= 32 && event->key() <= 126) {
+        buffer->insertChar(char(event->key()));
     }
     update();
 }

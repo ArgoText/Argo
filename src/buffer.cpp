@@ -11,6 +11,12 @@ Buffer::Buffer(unsigned int size) {
     bufferEnd = gapEnd;
 }
 
+Buffer::~Buffer() {
+    if (bufferStart) {
+        free(bufferStart);
+    }
+}
+
 /*
  * Expand buffer to new size + default gap size
  */
@@ -88,32 +94,30 @@ void Buffer::copyBytes(char *destination, char *source, unsigned int length) {
     }
 }
 
-/*
- * Sets point at specified location
- */
-void Buffer::setPoint(unsigned int loc) {
+
+void Buffer::setPoint(char * loc) {
+    point = loc;
+}
+
+void Buffer::setPointRelative(unsigned int loc) {
     point = bufferStart + loc;
     if (point > gapStart) {
         point += gapEnd - gapStart;
     }
 }
 
-/*
- * Moves point by specified count
- */
-void Buffer::movePoint(unsigned int count) {
-    point += count;
-    if (point >= gapStart && point < gapEnd) {
-        point = gapEnd;
-    }
-}
 
 char * Buffer::getPoint() {
     return point;
 }
 
-int Buffer::getRelativePoint() {
-    return point - bufferStart;
+int Buffer::getPointRelative() {
+    if (point > gapStart) {
+        return (point - (gapEnd - gapStart)) - bufferStart;
+    } else {
+        return point - bufferStart;
+    }
+    
 }
 
 int Buffer::getLine() {
@@ -131,6 +135,14 @@ char * Buffer::getBufferStart() {
 
 char * Buffer::getBufferEnd() {
     return bufferEnd;
+}
+
+char * Buffer::getGapStart() {
+    return gapStart;
+}
+
+char * Buffer::getGapEnd() {
+    return gapEnd;
 }
 
 void Buffer::setColumn(unsigned int column) {
@@ -155,8 +167,11 @@ char Buffer::nextChar() {
     if (point == gapStart) {
         point = gapEnd;
         return *point;
+    } else if (point == gapEnd) {
+        return *gapEnd;
+    } else {
+        return *(++point);
     }
-    return *(++point);
 }
 
 /*
@@ -165,8 +180,11 @@ char Buffer::nextChar() {
 char Buffer::previousChar() {
     if (point == gapEnd) {
         point = gapStart;
+    } else if (point == bufferStart) {
+        return *bufferStart;
+    } else {
+        return *(--point);
     }
-    return *(--point);
 }
 
 /*
@@ -182,7 +200,11 @@ void Buffer::insertChar(char ch) {
     }
 
     *(gapStart++) = ch;
+
     point++;
+
+    printBuffer();
+
 }
 
 void Buffer::insertString(const char *string) {
@@ -200,6 +222,11 @@ void Buffer::deleteChar() {
         moveGapToPoint();
     }
     gapEnd++;
+}
+
+void Buffer::backspace() {
+    previousChar();
+    deleteChar();
 }
 
 /*
