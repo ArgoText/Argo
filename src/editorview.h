@@ -21,4 +21,6 @@ private:
     QFont displayFont;
     int count;
     Buffer *buffer;
+    int charWidth;
+    int lineHeight;
 };

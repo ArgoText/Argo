@@ -13,6 +13,10 @@ EditorView::EditorView(QWidget *parent) : QWidget(parent) {
     setFocusPolicy(Qt::StrongFocus);
     buffer = new Buffer;
     displayFont = QFont("DejaVu Sans Mono");
+    displayFont.setStyleHint(QFont::Monospace);
+    QFontMetrics fontMetrics(displayFont);
+    charWidth = fontMetrics.horizontalAdvance("A");
+    lineHeight = fontMetrics.height();
     resize(2000, 20000);
     //displayFont = QFont("Monaco");
 }
@@ -21,25 +25,19 @@ EditorView::~EditorView() {};
 
 void EditorView::paintEvent(QPaintEvent *event) {
 
-    resize(2000, 20000);
-
     QPainter painter(this);
     painter.fillRect(event->rect(), QBrush(QColor(10, 19, 27)));
     painter.setPen(QPen(QColor(255,255,255)));
-    displayFont.setStyleHint(QFont::Monospace);
     painter.setFont(displayFont);
-    QFontMetrics fontMetrics(displayFont);
-
-    int width = fontMetrics.horizontalAdvance("A");
-    QString a = QString(QChar('A'));
 
     char *curr = buffer->getBufferStart();
     int line = 0;
     int col = 0;
-    while (curr < buffer->getBufferEnd()) {
+
+    while (curr < buffer->getBufferEnd() && line * lineHeight < event->rect().bottom()) {
 
         if (curr == buffer->getPoint()) {
-            painter.drawRect(width * (col) - 1, fontMetrics.height() * line, 1, fontMetrics.height());
+            painter.drawRect(charWidth * (col) - 1, lineHeight * line, 1, lineHeight);
         }
 
         if (curr < buffer->getGapStart() || curr >= buffer->getGapEnd()) {
@@ -47,13 +45,19 @@ void EditorView::paintEvent(QPaintEvent *event) {
                 line++;
                 col = 0;
             } else {
-                painter.drawText(width * col, fontMetrics.height() * (line + 1), QString(QChar(*curr)));
+                if (lineHeight * (line + 10) >= event->rect().top() && lineHeight * (line - 10) <= event->rect().bottom() 
+                && charWidth * col >= event->rect().left() && charWidth * col <= event->rect().right()) {
+                    painter.drawText(charWidth * col, lineHeight * (line + 1), QString(QChar(*curr)));
+                }
                 col++;
             }
         }
-
         curr++;
+    }
 
+    //check where cursor is again in case it is at the end of the buffer
+    if (curr == buffer->getPoint()) {
+        painter.drawRect(charWidth * (col) - 1, lineHeight * line, 1, lineHeight);
     }
 }
 
@@ -74,7 +78,7 @@ void EditorView::keyPressEvent(QKeyEvent *event) {
         buffer->backspace();
     } else if (event->modifiers() & Qt::ControlModifier) {
         if (event->key() == Qt::Key_O) {
-            QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),"/home",tr("Text Files (*.cpp)"));
+            QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),"/home",tr("All Files (*)"));
             char ch;
             std::ifstream fin(fileName.toUtf8().constData(), std::ifstream::in);
             while (fin >> std::noskipws >> ch) {
@@ -91,7 +95,7 @@ void EditorView::keyPressEvent(QKeyEvent *event) {
                 char *current = buffer->getBufferStart();
 
                 while (current < buffer->getBufferEnd()) {
-                    if (*current < 128 && *current != '\00') {
+                    if ((current < buffer->getGapStart() || current >= buffer->getGapEnd()) && (*current < 128 && *current != '\00')) {
                         stream << *current;
                     }
                     current++;

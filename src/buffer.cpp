@@ -165,9 +165,9 @@ char Buffer::getChar() {
  */
 char Buffer::nextChar() {
     if (point == gapStart) {
-        point = gapEnd;
+        point = gapEnd + 1;
         return *point;
-    } else if (point == gapEnd) {
+    } else if (point == bufferEnd) {
         return *gapEnd;
     } else {
         return *(++point);
@@ -179,7 +179,8 @@ char Buffer::nextChar() {
  */
 char Buffer::previousChar() {
     if (point == gapEnd) {
-        point = gapStart;
+        point = gapStart - 1;
+        return *point;
     } else if (point == bufferStart) {
         return *bufferStart;
     } else {
@@ -202,8 +203,6 @@ void Buffer::insertChar(char ch) {
     *(gapStart++) = ch;
 
     point++;
-
-    printBuffer();
 
 }
 
@@ -288,5 +287,5 @@ void Buffer::printBuffer() {
         }
         curr++;
     }
-    std::cout<<'\n';
+    std::cout << (point - bufferStart) <<'\n';
 }
