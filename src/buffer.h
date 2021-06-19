@@ -19,25 +19,31 @@ public:
 
     Buffer(unsigned int size = DEFAULT_GAP_SIZE);
 
+    ~Buffer();
+
     void moveGapToPoint();
 
     void copyBytes(char *destination, char *source, unsigned int length);
 
-    void setPoint(unsigned int loc);
+    void setPoint(char * loc);
 
-    void setPointAbsolute(char * loc);
-
-    void movePoint(unsigned int count);
+    void setPointRelative(unsigned int loc);
 
     char * getPoint();
 
-    int getRelativePoint();
+    int getPointRelative();
 
     int getLine();
 
     int getColumn();
 
+    char * getBufferStart();
+
     char * getBufferEnd();
+
+    char * getGapStart();
+
+    char * getGapEnd();
 
     void setColumn(unsigned int column);
 
@@ -54,6 +60,8 @@ public:
     void insertString(const char *string);
 
     void deleteChar();
+
+    void backspace();
 
     void replaceChar(char ch);
 

@@ -12,7 +12,6 @@ public:
     ~EditorView();
 
     void updateFont(const QFont &font);
-    QSize sizeHint() const override;
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -22,4 +21,6 @@ private:
     QFont displayFont;
     int count;
     Buffer *buffer;
+    int charWidth;
+    int lineHeight;
 };

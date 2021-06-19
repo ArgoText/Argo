@@ -1,13 +1,24 @@
 #include <iostream>
+#include <fstream>
 #include <QPainter>
 #include <QSize>
 #include <QFontMetrics>
+#include <QFileDialog>
+#include <QTextStream>
+#include <QColor>
 #include "editorview.h"
 
 EditorView::EditorView(QWidget *parent) : QWidget(parent) {
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
     buffer = new Buffer;
+    displayFont = QFont("DejaVu Sans Mono");
+    displayFont.setStyleHint(QFont::Monospace);
+    QFontMetrics fontMetrics(displayFont);
+    charWidth = fontMetrics.horizontalAdvance("A");
+    lineHeight = fontMetrics.height();
+    resize(2000, 20000);
+    //displayFont = QFont("Monaco");
 }
 
 EditorView::~EditorView() {};
@@ -15,40 +26,39 @@ EditorView::~EditorView() {};
 void EditorView::paintEvent(QPaintEvent *event) {
 
     QPainter painter(this);
-    painter.fillRect(event->rect(), QBrush(Qt::white));
-    painter.setPen(QPen(Qt::black));
-    displayFont.setStyleHint(QFont::TypeWriter);
+    painter.fillRect(event->rect(), QBrush(QColor(10, 19, 27)));
+    painter.setPen(QPen(QColor(255,255,255)));
     painter.setFont(displayFont);
-    QFontMetrics fontMetrics(displayFont);
 
-    int width = fontMetrics.horizontalAdvance("A") + 1;
-    QString a = QString(QChar('A'));
+    char *curr = buffer->getBufferStart();
+    int line = 0;
+    int col = 0;
 
-    int firstLineVisible = event->rect().top() / fontMetrics.height();
-    int lastLineVisible = firstLineVisible + event->rect().height() / fontMetrics.height() + 1;
+    while (curr < buffer->getBufferEnd() && line * lineHeight < event->rect().bottom()) {
 
-    int initialPoint = buffer->getRelativePoint();
-
-    buffer->setPoint(0);
-
-
-    // for(int line = firstLineVisible; line <= lastLineVisible; line++) {
-//        for(int column = 0; column < 80; column++) {
-//            painter.drawText(width * column, fontMetrics.height() * line, QString(QChar('A')));
-//        }
-        //painter.drawText(0, fontMetrics.height() * line, QString::number(line));
-    int line = 1;
-    while (buffer->getPoint() < buffer->getBufferEnd()) {    
-        int col = 0;
-        while (buffer->getChar() != Qt::Key_Enter && buffer->getPoint() < buffer->getBufferEnd()) {
-            painter.drawText(width * col, fontMetrics.height() * line, QString(QChar(buffer->getChar())));
-            buffer->movePoint(1);
-            col++;
+        if (curr == buffer->getPoint()) {
+            painter.drawRect(charWidth * (col) - 1, lineHeight * line, 1, lineHeight);
         }
-        buffer->movePoint(1);
-        line++;
+
+        if (curr < buffer->getGapStart() || curr >= buffer->getGapEnd()) {
+            if (*curr == '\n') {
+                line++;
+                col = 0;
+            } else {
+                if (lineHeight * (line + 10) >= event->rect().top() && lineHeight * (line - 10) <= event->rect().bottom() 
+                && charWidth * col >= event->rect().left() && charWidth * col <= event->rect().right()) {
+                    painter.drawText(charWidth * col, lineHeight * (line + 1), QString(QChar(*curr)));
+                }
+                col++;
+            }
+        }
+        curr++;
     }
-    buffer->setPoint(initialPoint);
+
+    //check where cursor is again in case it is at the end of the buffer
+    if (curr == buffer->getPoint()) {
+        painter.drawRect(charWidth * (col) - 1, lineHeight * line, 1, lineHeight);
+    }
 }
 
 
@@ -57,29 +67,48 @@ void EditorView::updateFont(const QFont &font) {
     update();
 }
 
-/*
- * initial size of the editor widget
- */
-QSize EditorView::sizeHint() const {
-    return QSize(1000, 10000);
-}
-
 void EditorView::keyPressEvent(QKeyEvent *event) {
-    if (event->modifiers() & Qt::ShiftModifier) {
-        if (event->key() != Qt::Key_Shift) {
-            buffer->insertChar(char(event->key()));
-        }
-    } else if (event->modifiers() & Qt::CtrlModifier) {
-        if (event->key() != Qt::Key_O) {
-            QStringList fileName = QFileDialog::getOpenFileName(this, tr("Open File"),"/home",tr("Text Files (*.txt)"));
+    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+        buffer->insertChar('\n');
+    } else if (event->key() == Qt::Key_Right) {
+        buffer->nextChar();
+    } else if (event->key() == Qt::Key_Left) {
+        buffer->previousChar();
+    } else if (event->key() == Qt::Key_Backspace) {
+        buffer->backspace();
+    } else if (event->modifiers() & Qt::ControlModifier) {
+        if (event->key() == Qt::Key_O) {
+            QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),"/home",tr("All Files (*)"));
             char ch;
-            fstream fin(f, fstream::in);
-            while (fin >> noskipws >> ch) {
+            std::ifstream fin(fileName.toUtf8().constData(), std::ifstream::in);
+            while (fin >> std::noskipws >> ch) {
                 buffer->insertChar(ch);
             }
+        } else if (event->key() == Qt::Key_S) {
+            QString fileName = QFileDialog::getSaveFileName(this,
+                                                            tr("Save file"), "",
+                                                            tr("All Files (*)"));
+            QFile file(fileName.toUtf8().constData());
+            if(file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+                QTextStream stream(&file);
+
+                char *current = buffer->getBufferStart();
+
+                while (current < buffer->getBufferEnd()) {
+                    if ((current < buffer->getGapStart() || current >= buffer->getGapEnd()) && (*current < 128 && *current != '\00')) {
+                        stream << *current;
+                    }
+                    current++;
+                }
+
+                file.close();
+                //qDebug() << "Writing finished";
+            }
         }
-    } else {
+    } else if (event->key() >= 65 && event->key() <= 90 && !(event->modifiers() & Qt::ShiftModifier)) {
         buffer->insertChar(char(event->key() + 32));
+    } else if (event->key() >= 32 && event->key() <= 126) {
+        buffer->insertChar(char(event->key()));
     }
     update();
 }
