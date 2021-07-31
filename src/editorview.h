@@ -29,6 +29,7 @@ private:
     int charWidth;
     int lineHeight;
     AutocompleteView *autocompleteView;
+    const int lineNumberWidth = 6;
 };
 
 #endif

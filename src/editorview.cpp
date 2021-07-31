@@ -18,7 +18,7 @@ EditorView::EditorView(QWidget *parent) : QWidget(parent) {
     QFontMetrics fontMetrics(displayFont);
     charWidth = fontMetrics.horizontalAdvance("A");
     lineHeight = fontMetrics.height();
-    //resize(2000, 20000);
+    resize(2000, 20000);
     //displayFont = QFont("Monaco");
 }
 
@@ -27,20 +27,20 @@ EditorView::~EditorView() {};
 void EditorView::paintEvent(QPaintEvent *event) {
 
     QPainter painter(this);
-    painter.fillRect(event->rect(), QBrush(QColor(10, 19, 27)));
+    painter.fillRect(event->rect(), QBrush(QColor(20, 20, 20)));
     painter.setPen(QPen(QColor(255,255,255)));
     painter.setFont(displayFont);
 
     char *curr = buffer->getBufferStart();
     int line = 0;
-    int col = 0;
+    int col = lineNumberWidth;
 
     int maxCol = 0;
 
     while (curr < buffer->getBufferEnd() && line * lineHeight < event->rect().bottom()) {
 
         if (curr == buffer->getPoint()) {
-            painter.drawRect(charWidth * (col) - 1, lineHeight * line, 1, lineHeight);
+            painter.drawRect(charWidth * (col) - 1, lineHeight * line + 2, 1, lineHeight - 2);
         }
 
         if (curr < buffer->getGapStart() || curr >= buffer->getGapEnd()) {
@@ -49,11 +49,12 @@ void EditorView::paintEvent(QPaintEvent *event) {
                     maxCol = col;
                 }
                 line++;
-                col = 0;
+                col = lineNumberWidth;
             } else {
-                if (lineHeight * (line + 10) >= event->rect().top() && lineHeight * (line - 10) <= event->rect().bottom() 
-                && charWidth * col >= event->rect().left() && charWidth * col <= event->rect().right()) {
-                    painter.drawText(charWidth * col, lineHeight * (line + 1), QString(QChar(*curr)));
+                if (lineHeight * (line + 10) >= event->rect().top() && lineHeight * (line - 10) <= event->rect().bottom()) {
+                    if (charWidth * col >= event->rect().left() && charWidth * col <= event->rect().right()) {
+                        painter.drawText(charWidth * col, lineHeight * (line + 1), QString(QChar(*curr)));
+                    }
                 }
                 col++;
             }
@@ -65,6 +66,14 @@ void EditorView::paintEvent(QPaintEvent *event) {
     if (curr == buffer->getPoint()) {
         painter.drawRect(charWidth * (col) - 1, lineHeight * line, 1, lineHeight);
     }
+
+    int firstLine = event->rect().top() / lineHeight;
+    int lastLine = event->rect().bottom() / lineHeight + 1;
+    painter.setPen(QPen(QColor(100,100,100)));
+    for(int i = firstLine; i < lastLine; i++) {
+        painter.drawText(2, lineHeight * (i + 1), QString::number(i + 1));
+    }
+    painter.drawLine((lineNumberWidth - 1) * charWidth, event->rect().top(), (lineNumberWidth - 1) * charWidth, event->rect().bottom());
 }
 
 
