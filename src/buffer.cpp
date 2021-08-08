@@ -1,5 +1,6 @@
 #include <iostream>
 #include "buffer.h"
+#include <string.h>
 
 Buffer::Buffer(unsigned int size) {
     bufferStart = (char *) malloc(size);
@@ -55,6 +56,7 @@ void Buffer::moveGapToPoint() {
 
     if (point == gapEnd) {
         point = gapStart;
+        return;
     }
 
     if(point < gapStart) {
@@ -165,10 +167,14 @@ char Buffer::getChar() {
  */
 char Buffer::nextChar() {
     if (point == gapStart) {
-        point = gapEnd + 1;
+        point = gapEnd;
+        if (point < bufferEnd) {
+            point++;
+        }
         return *point;
-    } else if (point == bufferEnd) {
-        return *gapEnd;
+    } else if (point >= bufferEnd) {
+        point = bufferEnd;
+        return *point;
     } else {
         return *(++point);
     }
@@ -180,6 +186,9 @@ char Buffer::nextChar() {
 char Buffer::previousChar() {
     if (point == gapEnd) {
         point = gapStart - 1;
+        if (point < bufferStart) {
+            point = bufferStart;
+        }
         return *point;
     } else if (point == bufferStart) {
         return *bufferStart;
@@ -240,6 +249,30 @@ void Buffer::replaceChar(char ch) {
         point = gapEnd;
     }
     *point = ch;
+}
+
+void Buffer::currentWord(char *dst, int max) {
+    char *returnPoint = point;
+
+    previousChar();
+    while (point != getBufferStart() && getChar() != ' ' && getChar() != '\n') {
+        previousChar();
+    }
+
+    if (getChar() == ' ' || getChar() == '\n') {
+        nextChar();
+    }
+
+    int length = 0;
+
+    while (length < max && getChar() != ' ' && getChar() != '\n' && point != bufferEnd) {
+        dst[length] = getChar();
+        length++;
+        nextChar();
+    }
+
+    point = returnPoint;
+    dst[length] = '\0';
 }
 
 /*
