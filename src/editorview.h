@@ -18,6 +18,8 @@ public:
 
     void updateFont(const QFont &font);
 
+    static const int MAX_WORD_SIZE = 20;
+
 protected:
     void paintEvent(QPaintEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
@@ -30,6 +32,7 @@ private:
     int lineHeight;
     AutocompleteView *autocompleteView;
     const int lineNumberWidth = 6;
+    char currentWord[100];
 };
 
 #endif

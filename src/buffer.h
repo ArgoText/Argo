@@ -66,6 +66,8 @@ public:
 
     void backspace();
 
+    void currentWord(char *dst, int max);
+
     void replaceChar(char ch);
 
     char * searchForward(char ch);

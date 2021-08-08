@@ -11,6 +11,7 @@
 EditorView::EditorView(QWidget *parent) : QWidget(parent) {
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
+    grabKeyboard();
     buffer = new Buffer;
     autocompleteView = new AutocompleteView;
     displayFont = QFont("DejaVu Sans Mono");
@@ -19,7 +20,6 @@ EditorView::EditorView(QWidget *parent) : QWidget(parent) {
     charWidth = fontMetrics.horizontalAdvance("A");
     lineHeight = fontMetrics.height();
     resize(2000, 20000);
-    //displayFont = QFont("Monaco");
 }
 
 EditorView::~EditorView() {};
@@ -64,7 +64,7 @@ void EditorView::paintEvent(QPaintEvent *event) {
 
     //check where cursor is again in case it is at the end of the buffer
     if (curr == buffer->getPoint()) {
-        painter.drawRect(charWidth * (col) - 1, lineHeight * line, 1, lineHeight);
+        painter.drawRect(charWidth * (col) - 1, lineHeight * line + 2, 1, lineHeight - 2);
     }
 
     int firstLine = event->rect().top() / lineHeight;
@@ -74,6 +74,9 @@ void EditorView::paintEvent(QPaintEvent *event) {
         painter.drawText(2, lineHeight * (i + 1), QString::number(i + 1));
     }
     painter.drawLine((lineNumberWidth - 1) * charWidth, event->rect().top(), (lineNumberWidth - 1) * charWidth, event->rect().bottom());
+
+    buffer->currentWord(currentWord, MAX_WORD_SIZE);
+    printf("%s\n", currentWord);
 }
 
 
