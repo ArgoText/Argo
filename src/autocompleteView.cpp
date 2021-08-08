@@ -18,8 +18,9 @@ void AutocompleteView::update(char key) {
         prefix = "\0";
     } else if (key == 127) {
         char *n_prefix = new char[strlen(prefix)];
-        if (strlen(prefix) - 1 >= 0) {
-            strncpy(n_prefix, prefix, strlen(prefix) - 1);
+        int len = strlen(prefix) - 1;
+        if (len >= 0) {
+            strncpy(n_prefix, prefix, len);
             n_prefix[strlen(prefix) - 1] = '\0';
         }
         prefix = n_prefix;
