@@ -99,6 +99,8 @@ void EditorView::keyPressEvent(QKeyEvent *event) {
         buffer->insertString("    ");
     } else if (event->modifiers() & Qt::ControlModifier) {
         if (event->key() == Qt::Key_O) {
+            delete this->buffer;
+            this->buffer = new Buffer;
             QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),"/home",tr("All Files (*)"));
             std::cout << fileName.toUtf8().constData();;
             char ch;
