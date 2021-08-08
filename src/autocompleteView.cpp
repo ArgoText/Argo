@@ -30,10 +30,12 @@ void AutocompleteView::update(char key) {
         n_prefix[strlen(prefix) + 1] = '\0';
         prefix = n_prefix;
     }
-    vector<char *> pw = vector<char *>();
-    pTree->possibleWords(prefix, curr, &pw);
-    std::cout << pw.size() << "\n";
-    for (char *c : pw) {
-        std::cout << c << "\n";
+    if (strlen(prefix) != 0) {
+        vector<char *> pw = vector<char *>();
+        pTree->possibleWords(prefix, curr, &pw);
+        std::cout << pw.size() << "\n";
+        for (char *c : pw) {
+            std::cout << c << "\n";
+        }
     }
 }

@@ -89,7 +89,7 @@ void EditorView::keyPressEvent(QKeyEvent *event) {
         buffer->nextChar();
     } else if (event->key() == Qt::Key_Left) {
         buffer->previousChar();
-    } else if (event->key() == Qt::Key_Backspace) {
+    } else if (event->key() == Qt::Key_Backspace and !buffer->atStart()) {
         buffer->backspace();
         autocompleteView->update(char(127));
     } else if (event->key() == Qt::Key_Tab) {
@@ -97,6 +97,7 @@ void EditorView::keyPressEvent(QKeyEvent *event) {
     } else if (event->modifiers() & Qt::ControlModifier) {
         if (event->key() == Qt::Key_O) {
             QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),"/home",tr("All Files (*)"));
+            std::cout << fileName.toUtf8().constData();;
             char ch;
             std::ifstream fin(fileName.toUtf8().constData(), std::ifstream::in);
             while (fin >> std::noskipws >> ch) {

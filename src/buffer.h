@@ -78,6 +78,7 @@ public:
 
     void printBuffer();
 
+    bool atStart();
 };
 
 #endif

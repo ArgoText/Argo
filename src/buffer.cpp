@@ -223,6 +223,10 @@ void Buffer::deleteChar() {
     gapEnd++;
 }
 
+bool Buffer::atStart() {
+    return point == bufferStart;
+}
+
 void Buffer::backspace() {
     previousChar();
     deleteChar();
