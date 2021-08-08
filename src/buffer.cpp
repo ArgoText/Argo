@@ -229,7 +229,10 @@ void Buffer::deleteChar() {
     if (point != gapStart) {
         moveGapToPoint();
     }
-    gapEnd++;
+
+    if (gapEnd < bufferEnd) {
+        gapEnd++;
+    }
 }
 
 bool Buffer::atStart() {
