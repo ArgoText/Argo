@@ -7,6 +7,7 @@
 #include "buffer.h"
 #include "trie.h"
 #include "autocompleteView.h"
+#include <set>
 
 
 class EditorView : public QWidget {
@@ -23,6 +24,7 @@ public:
 protected:
     void paintEvent(QPaintEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
+    void generateKeywords(char *fileName);
 
 private:
     QFont displayFont;
@@ -31,6 +33,7 @@ private:
     int charWidth;
     int lineHeight;
     AutocompleteView *autocompleteView;
+    set<string> keywords;
     const int lineNumberWidth = 6;
     char currentWord[100];
 };

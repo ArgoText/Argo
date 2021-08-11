@@ -13,6 +13,7 @@ EditorView::EditorView(QWidget *parent) : QWidget(parent) {
     setFocusPolicy(Qt::StrongFocus);
     grabKeyboard();
     buffer = new Buffer;
+    generateKeywords("../language/java.txt");
     autocompleteView = new AutocompleteView;
     displayFont = QFont("DejaVu Sans Mono");
     displayFont.setStyleHint(QFont::Monospace);
@@ -28,7 +29,12 @@ void EditorView::paintEvent(QPaintEvent *event) {
 
     QPainter painter(this);
     painter.fillRect(event->rect(), QBrush(QColor(20, 20, 20)));
-    painter.setPen(QPen(QColor(255,255,255)));
+    if (!keywords.count(currentWord)) {
+        painter.setPen(QPen(QColor(255,255,255)));
+    } else {
+        painter.setPen(QPen(QColor(155,55,55)));
+    }
+
     painter.setFont(displayFont);
 
     char *curr = buffer->getBufferStart();
@@ -137,4 +143,14 @@ void EditorView::keyPressEvent(QKeyEvent *event) {
         autocompleteView->update(char(event->key()));
     }
     update();
+}
+
+void EditorView::generateKeywords(char *fileName) {
+    fstream myfile(fileName, std::ios::in | std::ios::out);
+    string s;
+    set<string> newSet;
+    keywords = newSet;
+    while (getline(myfile, s)) {
+        keywords.insert(s);
+    }
 }
