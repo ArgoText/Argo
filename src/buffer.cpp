@@ -198,6 +198,51 @@ char Buffer::previousChar() {
 }
 
 /*
+ * Gets the char at the current start
+ */
+char Buffer::getChar(char *start) {
+    if (start == gapStart) {
+        start = gapEnd;
+    }
+    return *start;
+}
+
+/*
+ * Gets the char right after the current start
+ */
+char Buffer::nextChar(char *start) {
+    if (start == gapStart) {
+        start = gapEnd;
+        if (start < bufferEnd) {
+            start++;
+        }
+        return *start;
+    } else if (start >= bufferEnd) {
+        start = bufferEnd;
+        return *start;
+    } else {
+        return *(++start);
+    }
+}
+
+/*
+ * Gets the char right before the current start
+ */
+char Buffer::previousChar(char *start) {
+    if (start == gapEnd) {
+        start = gapStart - 1;
+        if (start < bufferStart) {
+            start = bufferStart;
+        }
+        return *start;
+    } else if (start == bufferStart) {
+        return *bufferStart;
+    } else {
+        return *(--start);
+    }
+}
+
+/*
  *
  */
 void Buffer::insertChar(char ch) {
@@ -254,27 +299,24 @@ void Buffer::replaceChar(char ch) {
     *point = ch;
 }
 
-void Buffer::currentWord(char *dst, int max) {
-    char *returnPoint = point;
-
-    previousChar();
-    while (point != getBufferStart() && getChar() != ' ' && getChar() != '\n') {
-        previousChar();
+void Buffer::currentWord(char *dst, int max, char *start) {
+    while (start != getBufferStart() && getChar(start) != ' ' && getChar(start) != '\n') {
+        start--;
     }
 
-    if (getChar() == ' ' || getChar() == '\n') {
-        nextChar();
+    if (getChar(start) == ' ' || getChar(start) == '\n') {
+        start++;
     }
 
     int length = 0;
 
-    while (length < max && getChar() != ' ' && getChar() != '\n' && point != bufferEnd) {
-        dst[length] = getChar();
-        length++;
-        nextChar();
+    while (length < max && getChar(start) != ' ' && getChar(start) != '\n' && start != bufferEnd) {
+        if (start < gapStart || start > gapEnd) {
+            dst[length] = getChar(start);
+            length++;
+        }
+        start++;
     }
-
-    point = returnPoint;
     dst[length] = '\0';
 }
 

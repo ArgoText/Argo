@@ -29,11 +29,6 @@ void EditorView::paintEvent(QPaintEvent *event) {
 
     QPainter painter(this);
     painter.fillRect(event->rect(), QBrush(QColor(20, 20, 20)));
-    if (!keywords.count(currentWord)) {
-        painter.setPen(QPen(QColor(255,255,255)));
-    } else {
-        painter.setPen(QPen(QColor(155,55,55)));
-    }
 
     painter.setFont(displayFont);
 
@@ -50,6 +45,14 @@ void EditorView::paintEvent(QPaintEvent *event) {
         }
 
         if (curr < buffer->getGapStart() || curr >= buffer->getGapEnd()) {
+            char currentWord[100];
+            buffer->currentWord(currentWord, MAX_WORD_SIZE, curr);
+            if (!keywords.count(currentWord)) {
+                painter.setPen(QPen(QColor(255,255,255)));
+            } else {
+                painter.setPen(QPen(QColor(155,55,55)));
+            }
+
             if (*curr == '\n') {
                 if (col > maxCol) {
                     maxCol = col;
@@ -80,9 +83,6 @@ void EditorView::paintEvent(QPaintEvent *event) {
         painter.drawText(2, lineHeight * (i + 1), QString::number(i + 1));
     }
     painter.drawLine((lineNumberWidth - 1) * charWidth, event->rect().top(), (lineNumberWidth - 1) * charWidth, event->rect().bottom());
-
-    buffer->currentWord(currentWord, MAX_WORD_SIZE);
-    printf("%s\n", currentWord);
 }
 
 
