@@ -66,7 +66,7 @@ public:
 
     void backspace();
 
-    void currentWord(char *dst, int max);
+    void currentWord(char *dst, int max, char *start);
 
     void replaceChar(char ch);
 
@@ -81,6 +81,12 @@ public:
     void printBuffer();
 
     bool atStart();
+
+    char previousChar(char *start);
+
+    char nextChar(char *start);
+
+    char getChar(char *start);
 };
 
 #endif
