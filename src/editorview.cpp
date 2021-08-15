@@ -41,17 +41,11 @@ void EditorView::paintEvent(QPaintEvent *event) {
     while (curr < buffer->getBufferEnd() && line * lineHeight < event->rect().bottom()) {
 
         if (curr == buffer->getPoint()) {
+            painter.setPen(QPen(QColor(255,255,255)));
             painter.drawRect(charWidth * (col) - 1, lineHeight * line + 2, 1, lineHeight - 2);
         }
 
         if (curr < buffer->getGapStart() || curr >= buffer->getGapEnd()) {
-            char currentWord[100];
-            buffer->currentWord(currentWord, MAX_WORD_SIZE, curr);
-            if (!keywords.count(currentWord)) {
-                painter.setPen(QPen(QColor(255,255,255)));
-            } else {
-                painter.setPen(QPen(QColor(155,55,55)));
-            }
 
             if (*curr == '\n') {
                 if (col > maxCol) {
@@ -62,6 +56,13 @@ void EditorView::paintEvent(QPaintEvent *event) {
             } else {
                 if (lineHeight * (line + 10) >= event->rect().top() && lineHeight * (line - 10) <= event->rect().bottom()) {
                     if (charWidth * col >= event->rect().left() && charWidth * col <= event->rect().right()) {
+                        char currentWord[100];
+                        buffer->currentWord(currentWord, MAX_WORD_SIZE, curr);
+                        if (!keywords.count(currentWord)) {
+                            painter.setPen(QPen(QColor(255,255,255)));
+                        } else {
+                            painter.setPen(QPen(QColor(155,55,55)));
+                        }
                         painter.drawText(charWidth * col, lineHeight * (line + 1), QString(QChar(*curr)));
                     }
                 }
