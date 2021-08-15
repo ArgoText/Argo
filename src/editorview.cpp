@@ -58,6 +58,7 @@ void EditorView::paintEvent(QPaintEvent *event) {
                     if (charWidth * col >= event->rect().left() && charWidth * col <= event->rect().right()) {
                         char currentWord[100];
                         buffer->currentWord(currentWord, MAX_WORD_SIZE, curr);
+                        printf("%s\n", currentWord);
                         if (!keywords.count(currentWord)) {
                             painter.setPen(QPen(QColor(255,255,255)));
                         } else {
@@ -74,6 +75,7 @@ void EditorView::paintEvent(QPaintEvent *event) {
 
     //check where cursor is again in case it is at the end of the buffer
     if (curr == buffer->getPoint()) {
+        painter.setPen(QPen(QColor(255,255,255)));
         painter.drawRect(charWidth * (col) - 1, lineHeight * line + 2, 1, lineHeight - 2);
     }
 

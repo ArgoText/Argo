@@ -36,9 +36,9 @@ void AutocompleteView::update(char key) {
     if (strlen(prefix) != 0) {
         vector<char *> pw = vector<char *>();
         pTree->possibleWords(prefix, curr, &pw);
-        std::cout << pw.size() << "\n";
-        for (char *c : pw) {
-            std::cout << c << "\n";
-        }
+//        std::cout << pw.size() << "\n";
+//        for (char *c : pw) {
+//            std::cout << c << "\n";
+//        }
     }
 }

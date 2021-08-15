@@ -78,7 +78,7 @@ void Buffer::copyBytes(char *destination, char *source, unsigned int length) {
     }
     if (source > destination) {
 
-        if (source + length >= bufferEnd) {
+        if (source + length - 1 >= bufferEnd) {
             return;
         }
 
@@ -311,7 +311,7 @@ void Buffer::currentWord(char *dst, int max, char *start) {
     int length = 0;
 
     while (length < max && getChar(start) != ' ' && getChar(start) != '\n' && start != bufferEnd) {
-        if (start < gapStart || start > gapEnd) {
+        if (start < gapStart || start >= gapEnd) {
             dst[length] = getChar(start);
             length++;
         }
