@@ -1,4 +1,4 @@
-# Argo
+# ArgoText
 
 Gap-buffer text editor implemented in C++ with a Qt frontend. 
 
